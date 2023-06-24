@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 20px;
+    }
+    
+    .jumbotron {
+      background-color: #f8f9fa;
+      padding: 40px;
+      margin-bottom: 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .btn-shorten {
+      background-color: #007bff;
+      color: #fff;
+      font-weight: bold;
+    }
+    
+    .short-url {
+      font-weight: bold;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>URL Shortener</h1>
+      <p>Shorten your long URLs for easy sharing.</p>
+    </div>
+    
+    <form id="url-shortener-form">
+      <div class="form-group">
+        <label for="original-url">Enter your long URL:</label>
+        <input type="text" class="form-control" id="original-url" placeholder="https://www.example.com">
+      </div>
+      <button type="submit" class="btn btn-primary btn-shorten">Shorten</button>
+    </form>
+    
+    <div id="short-url-container" class="mt-4">
+      <h4>Short URL:</h4>
+      <p class="short-url"></p>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // JavaScript logic for URL shortening functionality
+    // You can write your own JavaScript code here
+  </script>
+</body>
+</html>

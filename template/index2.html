@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      margin-top: 100px;
+      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      background-color: #4CAF50;
+      border: none;
+    }
+    
+    .btn:hover {
+      background-color: #45a049;
+    }
+    
+    .shortened-url {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">URL Shortener</h1>
+    <div class="input-group mb-3">
+      <input type="text" id="original-url" class="form-control" placeholder="Enter your URL">
+      <div class="input-group-append">
+        <button class="btn btn-primary" onclick="shortenUrl()">Shorten</button>
+      </div>
+    </div>
+    <div class="shortened-url">
+      <p id="short-url" class="text-center"></p>
+    </div>
+  </div>
+  
+  <script>
+    function shortenUrl() {
+      var originalUrl = document.getElementById('original-url').value;
+      // Send a request to the backend to generate a shortened URL
+      // Replace 'YOUR_BACKEND_URL' with the actual URL of your backend API
+      fetch('YOUR_BACKEND_URL', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ originalUrl: originalUrl })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Display the shortened URL to the user
+        document.getElementById('short-url').textContent = data.shortUrl;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+</body>
+</html>

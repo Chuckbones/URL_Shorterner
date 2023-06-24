@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    .input-group input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .btn:hover {
+      background-color: #45a049;
+    }
+    
+    .shortened-url {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>URL Shortener</h1>
+    <div class="input-group">
+      <input type="text" id="original-url" placeholder="Enter your URL">
+    </div>
+    <button class="btn" onclick="shortenUrl()">Shorten</button>
+    <div class="shortened-url">
+      <p id="short-url"></p>
+    </div>
+  </div>
+  
+  <script>
+    function shortenUrl() {
+      var originalUrl = document.getElementById('original-url').value;
+      // Send a request to the backend to generate a shortened URL
+      // Replace 'YOUR_BACKEND_URL' with the actual URL of your backend API
+      fetch('YOUR_BACKEND_URL', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ originalUrl: originalUrl })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Display the shortened URL to the user
+        document.getElementById('short-url').textContent = data.shortUrl;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+</body>
+</html>
