@@ -1,39 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <title>URL Shortener</title>
-</head>
-<body>
-  <div class="container">
-    <h1>URL Shortener</h1>
-    <form action="/shortUrls" method="POST" class="my-4 form-inline">
-      <label for="fullUrl" class="sr-only">Url</label>
-      <input required placeholder="Url" type="url" name="fullUrl" id="fullUrl" class="form-control col mr-2">
-      <button class="btn btn-success" type="submit">Shorten</button>
-    </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css"
+    />
+    <!-- <link rel="stylesheet" href="/styles.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+  font-family: Arial, sans-serif;
+}
+
+#searchbutton{
+  margin-top: 32px;
+}
+
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.form-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+}
+
+.my-4 {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.table {
+  margin-top: 40px;
+}
+
+.list-group-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #e9e9e9;
+  border-radius: 4px;
+}
+
+.autocorrect-result-data {
+  list-style: none;
+  padding: 0;
+}
+
+.autocorrect-result-data li {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #e9e9e9;
+  border-radius: 4px;
+}
+
+    </style>
+    <title>URL Shortener</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">URL Shortener</h1>
+      <form action="/shortUrls" method="POST" class="my-4">
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="fullUrl">Full URL:</label>
+            <input
+              type="url"
+              class="form-control"
+              id="fullUrl"
+              name="fullUrl"
+              required
+              placeholder="URL"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="notes">Notes:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="notes"
+              name="notes"
+              placeholder="Notes"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Shorten URL</button>
+      </form>
+      <div class="my-4">
+        <form action="/" method="GET" class="my-4">
+          <div class="form-row">
+            <div class="form-group col-md-8">
+              <label for="searchInput">Search:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="searchInput"
+                name="searchInput"
+                required
+                placeholder="Search"
+                value="<%= searchQuery %>"
+              />
+            </div>
+            <div class="form-group col-md-4">
+              <button type="submit" class="btn btn-success" id="searchbutton">Search</button>
+            </div>
+          </div>
+        </form>
+        <div id="autocorrect-results"></div>
+      </div>
+
+      <table class="table table-striped table-responsive">
+        <tbody>
+          <% if (searchResults?.length > 0) { %>
+          <h2>Search Results for "<%= searchQuery %>":</h2>
+          <ul class="list-group">
+            <% searchResults.forEach(function(shortUrl) { %>
+            <li class="list-group-item">
+              <p><strong>Full URL:</strong> <%= shortUrl.full %></p>
+              <p>
+                <strong>Short URL:</strong>
+                <a href="/<%= shortUrl.short %>" target="_blank"
+                  >/<%= shortUrl.short %></a
+                >
+              </p>
+              <p><strong>Notes:</strong> <%= shortUrl.notes %></p>
+              <p><strong>Clicks:</strong> <%= shortUrl.clicks %></p>
+            </li>
+            <% }); %>
+          </ul>
+          <% } else if(searchResults?.length < 0) { %>
+          <h2>No Search Results for "<%= searchQuery %>"</h2>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <script defer>
+      const autocorrectResultsDiv = document.getElementById(
+        "autocorrect-results"
+      );
     
-    <table class="table table-striped table-responsive">
-      <thead>
-        <tr>
-          <th>Full URL</th>
-          <th>Short URL</th>
-          <th>Clicks</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% shortUrls.forEach(shortUrl => { %>
-          <tr>
-            <td><a href="<%= shortUrl.full %>"><%= shortUrl.full %></a></td>
-            <td><a href="<%= shortUrl.short %>"><%= shortUrl.short %></a></td>
-            <td><%= shortUrl.clicks %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-</body>
+      document.getElementById("searchInput").oninput = (event) => {
+        $.ajax({
+          url: "/autocomplete",
+          data: {
+            q: event.target.value,
+          },
+          success: function (data) {
+            console.log(data);  
+            autocorrectResultsDiv.innerHTML =
+              '<ul class="list-group autocorrect-result-data">';
+            data.slice(0, 3).forEach((url) => {
+              autocorrectResultsDiv.innerHTML += `<li class="list-group-item">
+                <p><strong>Full Url:<a href="${url["full"]}" target="_blank">${url["full"]}</a>  </strong></p>
+                <p><strong>Short: <a href="${url["short"]}" target="_blank">${url["short"]}</a> </strong></p>
+                <p><strong>Notes: ${url["notes"]}  </strong></p>
+                <p><strong>Click: ${url["clicks"]} </strong></p></li>`;
+            });
+            autocorrectResultsDiv.innerHTML += "</ul>";
+          },
+        });
+      };
+    </script>
+  </body>
 </html>

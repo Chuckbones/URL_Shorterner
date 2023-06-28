@@ -1,34 +1,93 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const ShortUrl = require('./models/shortUrl')
-const app = express()
+const express = require("express");
+const mongoose = require("mongoose");
+const ShortUrl = require("./models/shortUrl");
+const app = express();
 
-mongoose.connect('mongodb://localhost/urlShortener', {
-  useNewUrlParser: true, useUnifiedTopology: true
-})
+mongoose.connect("mongodb+srv://helllo:bello@cluster1.ersvcze.mongodb.net/", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-app.set('view engine', 'ejs')
-app.use(express.urlencoded({ extended: false }))
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: false }));
+// app.use(express.static(__dirname + '/views'));
 
-app.get('/', async (req, res) => {
-  const shortUrls = await ShortUrl.find()
-  res.render('index', { shortUrls: shortUrls })
-})
+app.post("/shortUrls", async (req, res) => {
+  const { fullUrl, notes } = req.body;
+  // console.log({fullUrl, notes})
+  // alert('hello')
 
-app.post('/shortUrls', async (req, res) => {
-  await ShortUrl.create({ full: req.body.fullUrl })
+  try {
+    await ShortUrl.create({ full: fullUrl, notes });
+    res.redirect("/");
+  } catch (error) {
+    console.log(error);
+    res.send("Error creating short URL");
+  }
+});
 
-  res.redirect('/')
-})
+app.get("/", async (req, res) => {
+  try {
+    let searchQuery = req.query.searchInput || "";
+    searchQuery = searchQuery.trim();
+    
+    let shortUrls;
+    let searchResults;
 
-app.get('/:shortUrl', async (req, res) => {
-  const shortUrl = await ShortUrl.findOne({ short: req.params.shortUrl })
-  if (shortUrl == null) return res.sendStatus(404)
 
-  shortUrl.clicks++
-  shortUrl.save()
+    if (searchQuery !== "") {
+      shortUrls = await ShortUrl.find({
+        $or: [
+          { full: { $regex: searchQuery, $options: "i" } },
+          { short: { $regex: searchQuery, $options: "i" } },
+          { notes: { $regex: searchQuery, $options: "i" } },
+        ],
+      });
+      searchResults = shortUrls;
+    } else {
+      // console.log({ fullUrl: req.body.fullUrl });
+      shortUrls = await ShortUrl.find({ fullUrl: req.body.fullUrl });
+      searchResults = []; // Assign an empty array to searchResults
+    }
 
-  res.redirect(shortUrl.full)
-})
+    res.render("index", {
+      shortUrls,
+      searchResults: searchResults || [],
+      searchQuery,
+    });
+  } catch (error) {
+    console.log(error);
+    res.send("Error fetching short URLs");
+  }
+});
+
+app.get("/autocomplete", async (req, res) => {
+  const query = req.query.q;
+
+  try {
+    const shortUrls = await ShortUrl.find({
+      $or: [
+        { full: { $regex: query, $options: "i" } },
+        { short: { $regex: query, $options: "i" } },
+        { notes: { $regex: query, $options: "i" } },
+      ],
+    }).limit(3); // Limit the autocomplete results to a maximum of 3
+
+    res.json(shortUrls);
+  } catch (error) {
+    console.log(error);
+    res.send("Error fetching autocomplete results");
+  }
+});
+
+app.get("/:shortUrl", async (req, res) => {
+  const shortUrl = await ShortUrl.findOne({ short: req.params.shortUrl });
+  if (shortUrl == null) return res.sendStatus(404);
+
+  shortUrl.clicks++;
+  shortUrl.save();
+
+  res.redirect(shortUrl.full);
+});
 
 app.listen(process.env.PORT || 5000);
