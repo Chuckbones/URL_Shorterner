@@ -63,7 +63,7 @@ To deploy this project on localhost run:
 ```
 
 You can access your website in http://localhost:<PORT>
-## Usage/Examples
+## Usage
 - To shorten URL:-
   - Access the URL Shortener dashboard.
   - Enter the full URL you want to shorten.
