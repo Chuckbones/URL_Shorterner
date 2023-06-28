@@ -8,7 +8,7 @@
       rel="stylesheet"
       href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css"
     />
-    <!-- <link rel="stylesheet" href="/styles.css"> -->
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -100,7 +100,7 @@ h1 {
               id="fullUrl"
               name="fullUrl"
               required
-              placeholder="URL"
+              placeholder="Enter your URL here"
             />
           </div>
           <div class="form-group col-md-4">
@@ -127,7 +127,7 @@ h1 {
                 id="searchInput"
                 name="searchInput"
                 required
-                placeholder="Search"
+                placeholder="Search Here"
                 value="<%= searchQuery %>"
               />
             </div>
@@ -153,8 +153,8 @@ h1 {
                   >/<%= shortUrl.short %></a
                 >
               </p>
-              <p><strong>Notes:</strong> <%= shortUrl.notes %></p>
-              <p><strong>Clicks:</strong> <%= shortUrl.clicks %></p>
+              <p><strong>Notes: </strong> <%= shortUrl.notes %></p>
+              <p><strong>Clicks: </strong> <%= shortUrl.clicks %></p>
             </li>
             <% }); %>
           </ul>
@@ -166,31 +166,42 @@ h1 {
     </div>
 
     <script defer>
-      const autocorrectResultsDiv = document.getElementById(
-        "autocorrect-results"
-      );
+      let timeoutId;
+      const searchInput = document.getElementById("searchInput");
+      const autocorrectResultsDiv = document.getElementById("autocorrect-results");
     
-      document.getElementById("searchInput").oninput = (event) => {
-        $.ajax({
-          url: "/autocomplete",
-          data: {
-            q: event.target.value,
-          },
-          success: function (data) {
-            console.log(data);  
-            autocorrectResultsDiv.innerHTML =
-              '<ul class="list-group autocorrect-result-data">';
-            data.slice(0, 3).forEach((url) => {
-              autocorrectResultsDiv.innerHTML += `<li class="list-group-item">
-                <p><strong>Full Url:<a href="${url["full"]}" target="_blank">${url["full"]}</a>  </strong></p>
-                <p><strong>Short: <a href="${url["short"]}" target="_blank">${url["short"]}</a> </strong></p>
-                <p><strong>Notes: ${url["notes"]}  </strong></p>
-                <p><strong>Click: ${url["clicks"]} </strong></p></li>`;
+      searchInput.oninput = (event) => {
+        clearTimeout(timeoutId);
+    
+        timeoutId = setTimeout(() => {
+          const searchQuery = event.target.value.trim();
+    
+          if (searchQuery !== "") {
+            $.ajax({
+              url: "/autocomplete",
+              data: {
+                q: searchQuery,
+              },
+              success: function (data) {
+                console.log(data);
+                autocorrectResultsDiv.innerHTML =
+                  '<ul class="list-group autocorrect-result-data">';
+                data.slice(0, 3).forEach((url) => {
+                  autocorrectResultsDiv.innerHTML += `<li class="list-group-item">
+                    <p><strong>Full Url:<a href="${url["full"]}" target="_blank">${url["full"]}</a>  </strong></p>
+                    <p><strong>Short: <a href="${url["short"]}" target="_blank">${url["short"]}</a> </strong></p>
+                    <p><strong>Notes: ${url["notes"]}  </strong></p>
+                    <p><strong>Click: ${url["clicks"]} </strong></p></li>`;
+                });
+                autocorrectResultsDiv.innerHTML += "</ul>";
+              },
             });
-            autocorrectResultsDiv.innerHTML += "</ul>";
-          },
-        });
+          } else {
+            autocorrectResultsDiv.innerHTML = "";
+          }
+        }, 300); // Delay the execution for 300 milliseconds (adjust as needed)
       };
     </script>
+    
   </body>
 </html>
